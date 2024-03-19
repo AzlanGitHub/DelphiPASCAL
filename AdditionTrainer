@@ -1,0 +1,139 @@
+program MathTrainer;
+
+{$APPTYPE CONSOLE}
+
+uses
+  SysUtils, DateUtils;
+
+type
+  TDifficultyLevel = (Easy, Medium, Hard, Challenging, Expert);
+
+function GenerateQuestion(Difficulty: TDifficultyLevel; var Operand1, Operand2: Integer; var Operation: Char): Integer;
+begin
+  // Generiere Zahlen je nach Schwierigkeitsstufe
+  case Difficulty of
+    Easy: begin
+            Operand1 := Random(10);
+            Operand2 := Random(10);
+          end;
+    Medium: begin
+              Operand1 := Random(50) + 10;
+              Operand2 := Random(50) + 10;
+            end;
+    Hard: begin
+            Operand1 := Random(100) + 50;
+            Operand2 := Random(100) + 50;
+          end;
+    Challenging: begin
+                   Operand1 := Random(500) + 100;
+                   Operand2 := Random(500) + 100;
+                 end;
+    Expert: begin
+              Operand1 := Random(1000) + 500;
+              Operand2 := Random(1000) + 500;
+            end;
+  end;
+
+  // Zufällig wähle zwischen Addition und Multiplikation
+  if Random(2) = 0 then
+    Operation := '+'
+  else
+    Operation := 'x';
+
+  // Berechne die richtige Antwort
+  case Operation of
+    '+': Result := Operand1 + Operand2;
+    'x': Result := Operand1 * Operand2;
+  end;
+end;
+
+procedure DisplayQuestion(Operand1, Operand2: Integer; Operation: Char);
+begin
+  Write('What is ', Operand1, ' ', Operation, ' ', Operand2, '? ');
+end;
+
+function GetUserAnswer: Integer;
+var
+  UserInput: string;
+begin
+  // Lese Benutzereingabe ein
+  Readln(UserInput);
+  // Versuche, die Eingabe in eine Ganzzahl umzuwandeln
+  try
+    Result := StrToInt(UserInput);
+  except
+    // Wenn die Eingabe ungültig ist, gib -1 zurück
+    Result := -1;
+  end;
+end;
+
+procedure TrainMath;
+var
+  Difficulty: TDifficultyLevel;
+  Operand1, Operand2: Integer;
+  Operation: Char;
+  CorrectAnswer, UserAnswer: Integer;
+  StartTime, EndTime: TDateTime;
+begin
+  // Setze den Zufallsgenerator
+  Randomize;
+  
+  // Starte das Training
+  WriteLn('Welcome to Math Trainer!');
+  WriteLn('Choose difficulty level:');
+  WriteLn('1. Easy');
+  WriteLn('2. Medium');
+  WriteLn('3. Hard');
+  WriteLn('4. Challenging');
+  WriteLn('5. Expert');
+  Write('Enter your choice: ');
+
+  // Lese Schwierigkeitsstufe ein
+  case Readln of
+    '1': Difficulty := Easy;
+    '2': Difficulty := Medium;
+    '3': Difficulty := Hard;
+    '4': Difficulty := Challenging;
+    '5': Difficulty := Expert;
+  else
+    begin
+      WriteLn('Invalid choice. Exiting...');
+      Exit;
+    end;
+  end;
+
+  // Starte das Training
+  WriteLn('Get ready to train! You have 5 minutes.');
+
+  // Starte die Zeitnahme
+  StartTime := Now;
+
+  repeat
+    // Generiere eine Frage
+    CorrectAnswer := GenerateQuestion(Difficulty, Operand1, Operand2, Operation);
+    DisplayQuestion(Operand1, Operand2, Operation);
+
+    // Lese die Antwort des Benutzers ein
+    UserAnswer := GetUserAnswer;
+
+    // Überprüfe die Antwort
+    if UserAnswer = CorrectAnswer then
+      WriteLn('Correct!')
+    else
+      WriteLn('Incorrect. The correct answer is: ', CorrectAnswer);
+
+    // Überprüfe die Zeit
+    EndTime := Now;
+  until SecondsBetween(EndTime, StartTime) >= 300; // 5 Minuten sind vergangen
+
+  // Training beendet
+  WriteLn('Time is up! You have trained for 5 minutes.');
+end;
+
+begin
+  // Starte das Training
+  TrainMath;
+  // Warte, bevor das Konsolenfenster geschlossen wird
+  Write('Press Enter to exit...');
+  Readln;
+end.
